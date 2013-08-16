@@ -34,6 +34,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.CustomTheme;
 import android.content.res.Resources;
 import android.graphics.PixelFormat;
 import android.graphics.Rect;
@@ -195,6 +196,10 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     public void onCreate() {
         // First set up our views and stuff.
         mDisplay = ((WindowManager)getSystemService(Context.WINDOW_SERVICE)).getDefaultDisplay();
+        CustomTheme currentTheme = getResources().getConfiguration().customTheme;
+        if (currentTheme != null) {
+            mCurrentTheme = (CustomTheme)currentTheme.clone();
+        }
         makeStatusBarView(this);
 
         // Connect in to the status bar manager service
@@ -1458,6 +1463,15 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     void updateResources() {
         Resources res = getResources();
 
+        // detect theme change.
+        CustomTheme newTheme = res.getConfiguration().customTheme;
+        if (newTheme != null &&
+                (mCurrentTheme == null || !mCurrentTheme.equals(newTheme))) {
+            mCurrentTheme = (CustomTheme)newTheme.clone();
+            mCmBatteryMiniIcon.updateIconCache();
+            mCmBatteryMiniIcon.updateMatrix();
+            recreateStatusBar();
+        } else {
         mClearButton.setText(getText(R.string.status_bar_clear_all_button));
         mOngoingTitle.setText(getText(R.string.status_bar_ongoing_events_title));
         mLatestTitle.setText(getText(R.string.status_bar_latest_events_title));

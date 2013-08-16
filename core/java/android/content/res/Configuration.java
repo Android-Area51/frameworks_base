@@ -50,6 +50,11 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      */
     public Locale locale;
 
+     /**
+     * @hide
+     */
+    public CustomTheme customTheme;
+
     /**
      * Locale should persist on setting.  This is hidden because it is really
      * questionable whether this is the right way to expose the functionality.
@@ -241,6 +246,10 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         screenLayout = o.screenLayout;
         uiMode = o.uiMode;
         seq = o.seq;
+        if (o.customTheme != null) {
+            customTheme = (CustomTheme) o.customTheme.clone();
+        }
+    }
     }
     
     public String toString() {
@@ -275,6 +284,8 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             sb.append(" seq=");
             sb.append(seq);
         }
+        sb.append(" themeResource=");
+        sb.append(customTheme);
         sb.append('}');
         return sb.toString();
     }
@@ -297,6 +308,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         screenLayout = SCREENLAYOUT_SIZE_UNDEFINED;
         uiMode = UI_MODE_TYPE_UNDEFINED;
         seq = 0;
+        customTheme = null;
     }
 
     /** {@hide} */
@@ -393,6 +405,12 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         if (delta.seq != 0) {
             seq = delta.seq;
         }
+
+        if (delta.customTheme != null
+                && (customTheme == null || !customTheme.equals(delta.customTheme))) {
+            changed |= ActivityInfo.CONFIG_THEME_RESOURCE;
+            customTheme = (CustomTheme)delta.customTheme.clone();
+        }
         
         return changed;
     }
@@ -472,6 +490,11 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         if (delta.uiMode != (UI_MODE_TYPE_UNDEFINED|UI_MODE_NIGHT_UNDEFINED)
                 && uiMode != delta.uiMode) {
             changed |= ActivityInfo.CONFIG_UI_MODE;
+        }
+
+        if (delta.customTheme != null &&
+                (customTheme == null || !customTheme.equals(delta.customTheme))) {
+            changed |= ActivityInfo.CONFIG_THEME_RESOURCE;
         }
         
         return changed;
@@ -555,6 +578,13 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         dest.writeInt(screenLayout);
         dest.writeInt(uiMode);
         dest.writeInt(seq);
+        if (customTheme == null) {
+            dest.writeInt(0);
+        } else {
+            dest.writeInt(1);
+            dest.writeString(customTheme.getThemeId());
+            dest.writeString(customTheme.getThemePackageName());
+        }
     }
 
     public void readFromParcel(Parcel source) {
@@ -576,6 +606,12 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         screenLayout = source.readInt();
         uiMode = source.readInt();
         seq = source.readInt();
+
+        if (source.readInt() != 0) {
+            String themeId = source.readString();
+            String themePackage = source.readString();
+            customTheme = new CustomTheme(themeId, themePackage);
+        }
     }
     
     public static final Parcelable.Creator<Configuration> CREATOR
@@ -635,8 +671,18 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         n = this.screenLayout - that.screenLayout;
         if (n != 0) return n;
         n = this.uiMode - that.uiMode;
-        //if (n != 0) return n;
+        if (n != 0) return n;
         return n;
+        if (this.customTheme == null) {
+            if (that.customTheme != null) return 1;
+        } else if (that.customTheme == null) {
+            return -1;
+        } else {
+            n = this.customTheme.getThemeId().compareTo(that.customTheme.getThemeId());
+            if (n != 0) return n;
+            n = this.customTheme.getThemePackageName().compareTo(that.customTheme.getThemePackageName());
+            if (n != 0) return n;
+        }
     }
 
     public boolean equals(Configuration that) {
@@ -660,5 +706,6 @@ public final class Configuration implements Parcelable, Comparable<Configuration
                 + this.keyboard + this.keyboardHidden + this.hardKeyboardHidden
                 + this.navigation + this.navigationHidden
                 + this.orientation + this.screenLayout + this.uiMode;
+                + (this.customTheme != null ? this.customTheme.hashCode() : 0);
     }
 }

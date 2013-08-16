@@ -35,6 +35,7 @@ import android.content.pm.ServiceInfo;
 import android.content.res.AssetManager;
 import android.content.res.CompatibilityInfo;
 import android.content.res.Configuration;
+import android.content.res.CustomTheme;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDebug;
@@ -1193,8 +1194,21 @@ public final class ActivityThread {
         //}
 
         AssetManager assets = new AssetManager();
+        assets.setThemeSupport(compInfo.isThemeable);
         if (assets.addAssetPath(resDir) == 0) {
             return null;
+        }
+
+        /* Attach theme information to the resulting AssetManager when appropriate. */
+        Configuration config = getConfiguration();
+        if (compInfo.isThemeable && config != null) {
+            if (config.customTheme == null) {
+                config.customTheme = CustomTheme.getBootTheme();
+            }
+
+            if (!TextUtils.isEmpty(config.customTheme.getThemePackageName())) {
+                attachThemeAssets(assets, config.customTheme);
+            }
         }
 
         //Slog.i(TAG, "Resource: key=" + key + ", display metrics=" + metrics);
@@ -1220,6 +1234,81 @@ public final class ActivityThread {
             mActiveResources.put(key, new WeakReference<Resources>(r));
             return r;
         }
+    }
+
+    private void detachThemeAssets(AssetManager assets) {
+        String themePackageName = assets.getThemePackageName();
+        int themeCookie = assets.getThemeCookie();
+        if (!TextUtils.isEmpty(themePackageName) && themeCookie != 0) {
+            assets.detachThemePath(themePackageName, themeCookie);
+            assets.setThemePackageName(null);
+            assets.setThemeCookie(0);
+            assets.clearRedirections();
+        }
+    }
+
+    /**
+     * Attach the necessary theme asset paths and meta information to convert an
+     * AssetManager to being globally "theme-aware".
+     *
+     * @param assets
+     * @param theme
+     * @return true if the AssetManager is now theme-aware; false otherwise.
+     *         This can fail, for example, if the theme package has been been
+     *         removed and the theme manager has yet to revert formally back to
+     *         the framework default.
+     */
+    private boolean attachThemeAssets(AssetManager assets, CustomTheme theme) {
+        IAssetRedirectionManager rm = getAssetRedirectionManager();
+        if (rm == null) {
+            return false;
+        }
+        PackageInfo pi = null;
+        try {
+            pi = getPackageManager().getPackageInfo(theme.getThemePackageName(), 0);
+        } catch (RemoteException e) {
+        }
+        if (pi != null && pi.applicationInfo != null && pi.themeInfos != null) {
+            String themeResDir = pi.applicationInfo.publicSourceDir;
+            int cookie = assets.attachThemePath(themeResDir);
+            if (cookie != 0) {
+                String themePackageName = theme.getThemePackageName();
+                String themeId = theme.getThemeId();
+                int N = assets.getBasePackageCount();
+                for (int i = 0; i < N; i++) {
+                    String packageName = assets.getBasePackageName(i);
+                    int packageId = assets.getBasePackageId(i);
+
+                    /*
+                     * For now, we only consider redirections coming from the
+                     * framework or regular android packages. This excludes
+                     * themes and other specialty APKs we are not aware of.
+                     */
+                    if (packageId != 0x01 && packageId != 0x7f) {
+                        continue;
+                    }
+
+                    try {
+                        PackageRedirectionMap map = rm.getPackageRedirectionMap(themePackageName, themeId,
+                                packageName);
+                        if (map != null) {
+                            assets.addRedirections(map);
+                        }
+                    } catch (RemoteException e) {
+                        Log.e(TAG, "Failure accessing package redirection map, removing theme support.");
+                        assets.detachThemePath(themePackageName, cookie);
+                        return false;
+                    }
+                }
+
+                assets.setThemePackageName(theme.getThemePackageName());
+                assets.setThemeCookie(cookie);
+                return true;
+            } else {
+                Log.e(TAG, "Unable to attach theme assets at " + themeResDir);
+            }
+        }
+        return false;
     }
 
     /**
@@ -2984,6 +3073,16 @@ public final class ActivityThread {
             if (r != null) {
                 if (DEBUG_CONFIGURATION) Slog.v(TAG, "Changing resources "
                         + r + " config to: " + config);
+                boolean themeChanged = (changes & ActivityInfo.CONFIG_THEME_RESOURCE) != 0;
+                if (themeChanged) {
+                    AssetManager am = r.getAssets();
+                    if (am.hasThemeSupport()) {
+                        detachThemeAssets(am);
+                        if (!TextUtils.isEmpty(config.customTheme.getThemePackageName())) {
+                            attachThemeAssets(am, config.customTheme);
+                        }
+                    }
+                }
                 r.updateConfiguration(config, dm);
                 //Slog.i(TAG, "Updated app resources " + v.getKey()
                 //        + " " + r + ": " + r.getConfiguration());
