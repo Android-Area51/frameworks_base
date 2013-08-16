@@ -250,8 +250,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             customTheme = (CustomTheme) o.customTheme.clone();
         }
     }
-    }
-    
+   
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("{ scale=");
