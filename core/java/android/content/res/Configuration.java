@@ -704,7 +704,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
                 + this.touchscreen
                 + this.keyboard + this.keyboardHidden + this.hardKeyboardHidden
                 + this.navigation + this.navigationHidden
-                + this.orientation + this.screenLayout + this.uiMode;
+                + this.orientation + this.screenLayout + this.uiMode
                 + (this.customTheme != null ? this.customTheme.hashCode() : 0);
     }
 }
