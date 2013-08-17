@@ -43,6 +43,7 @@
 #define TABLE_SUPER_NOISY(x) //x
 #define LOAD_TABLE_NOISY(x) //x
 #define TABLE_THEME(x) //x
+#define REDIRECT_NOISY(x) //x
 
 namespace android {
 
