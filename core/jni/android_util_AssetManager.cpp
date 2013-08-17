@@ -756,20 +756,6 @@ static jint android_content_AssetManager_loadResourceBagValue(JNIEnv* env, jobje
     
     // Now lock down the resource object and start pulling stuff from it.
     res.lock();
-    
-    // Apply theme redirections to the referenced styles.
-    if (defStyleRes != 0) {
-        uint32_t ref = res.lookupRedirectionMap(defStyleRes);
-        if (ref != 0) {
-            defStyleRes = ref;
-        }
-    }
-    if (style != 0) {
-        uint32_t ref = res.lookupRedirectionMap(style);
-        if (ref != 0) {
-            style = ref;
-        }
-    }
 
     const ResTable::bag_entry* entry = NULL;
     uint32_t typeSpecFlags;
@@ -1010,6 +996,21 @@ static jboolean android_content_AssetManager_applyStyle(JNIEnv* env, jobject cla
 
     // Now lock down the resource object and start pulling stuff from it.
     res.lock();
+
+    
+    // Apply theme redirections to the referenced styles.
+    if (defStyleRes != 0) {
+        uint32_t ref = res.lookupRedirectionMap(defStyleRes);
+        if (ref != 0) {
+            defStyleRes = ref;
+        }
+    }
+    if (style != 0) {
+        uint32_t ref = res.lookupRedirectionMap(style);
+        if (ref != 0) {
+            style = ref;
+        }
+    }
 
     // Retrieve the default style bag, if requested.
     const ResTable::bag_entry* defStyleEnt = NULL;
