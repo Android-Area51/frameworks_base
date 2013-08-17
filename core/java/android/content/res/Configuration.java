@@ -671,7 +671,6 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         if (n != 0) return n;
         n = this.uiMode - that.uiMode;
         if (n != 0) return n;
-        return n;
         if (this.customTheme == null) {
             if (that.customTheme != null) return 1;
         } else if (that.customTheme == null) {
@@ -682,6 +681,8 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             n = this.customTheme.getThemePackageName().compareTo(that.customTheme.getThemePackageName());
             if (n != 0) return n;
         }
+
+        return n;
     }
 
     public boolean equals(Configuration that) {
