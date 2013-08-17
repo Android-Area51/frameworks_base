@@ -864,6 +864,24 @@ public final class AssetManager {
 
     private native final int splitThemePackage(String srcFileName, String dstFileName, String [] drmProtectedAssetNames);
 
+    /**
+     * {@hide}
+     */
+    public native final int getBasePackageCount();
+
+    /**
+     * {@hide}
+     */
+    public native final String getBasePackageName(int index);
+
+    /**
+     * {@hide}
+     */
+    public native final int getBasePackageId(int index);
+
+    private native final void addRedirectionsNative(int redirectionMapNativePointer);
+    private native final void clearRedirectionsNative();
+
     private native final void init();
     private native final void destroy();
 
