@@ -1476,32 +1476,6 @@ static jint android_content_AssetManager_retrieveArray(JNIEnv* env, jobject claz
     
     return JNI_TRUE;
 }
-
-static jint android_content_AssetManager_getArraySize(JNIEnv* env, jobject clazz,
-                                                       jint id)
-{
-    AssetManager* am = assetManagerForJavaObject(env, clazz);
-    if (am == NULL) {
-        return NULL;
-    }
-    const ResTable& res(am->getResources());
-    
-    res.lock();
-    const ResTable::bag_entry* defStyleEnt = NULL;
-    ssize_t bagOff = res.getBagLocked(id, &defStyleEnt);
-    res.unlock();
-    
-    return bagOff;
-}
-
-static jint android_content_AssetManager_retrieveArray(JNIEnv* env, jobject clazz,
-                                                        jint id,
-                                                        jintArray outValues)
-{
-    if (outValues == NULL) {
-        jniThrowException(env, "java/lang/NullPointerException", "out values");
-        return JNI_FALSE;
-    }
     
     AssetManager* am = assetManagerForJavaObject(env, clazz);
     if (am == NULL) {
@@ -1913,6 +1887,16 @@ static jobject android_content_AssetManager_getAssetAllocations(JNIEnv* env, job
 static jint android_content_AssetManager_getGlobalAssetManagerCount(JNIEnv* env, jobject clazz)
 {
     return AssetManager::getGlobalCount();
+}
+
+static jint android_content_AssetManager_getBasePackageCount(JNIEnv* env, jobject clazz)
+{
+    AssetManager* am = assetManagerForJavaObject(env, clazz);
+    if (am == NULL) {
+        return JNI_FALSE;
+    }
+
+    return am->getResources().getBasePackageCount();
 }
 
 static jstring android_content_AssetManager_getBasePackageName(JNIEnv* env, jobject clazz, jint index)
