@@ -731,7 +731,6 @@ static jint android_content_AssetManager_loadResourceValue(JNIEnv* env, jobject 
         return 0;
     }
 #endif
-    uint32_t ref = ident;
     if (resolve) {
         block = res.resolveReference(&value, block, &ref);
 #if THROW_ON_BAD_ID
