@@ -1308,6 +1308,8 @@ static jboolean android_content_AssetManager_retrieveAttributes(JNIEnv* env, job
             value.dataType = Res_value::TYPE_NULL;
         }
         
+        //printf("Attribute 0x%08x: final type=0x%x, data=0x%08x\n", curIdent, value.dataType, value.data);
+        
         // Write the final value back to Java.
         dest[STYLE_TYPE] = value.dataType;
         dest[STYLE_DATA] = value.data;
@@ -1442,94 +1444,6 @@ static jint android_content_AssetManager_retrieveArray(JNIEnv* env, jobject claz
                     LOGW("array redirect failure from 0x%08x => 0x%08x, array id=0x%08x", resid, redirect, id);
                 }
             }
-        }
-
-        
-        //printf("Attribute 0x%08x: final type=0x%x, data=0x%08x\n", curIdent, value.dataType, value.data);
-        
-        // Write the final value back to Java.
-        dest[STYLE_TYPE] = value.dataType;
-        dest[STYLE_DATA] = value.data;
-        dest[STYLE_ASSET_COOKIE] =
-            block != kXmlBlock ? (jint)res.getTableCookie(block) : (jint)-1;
-        dest[STYLE_RESOURCE_ID] = resid;
-        dest[STYLE_CHANGING_CONFIGURATIONS] = typeSetFlags;
-        dest[STYLE_DENSITY] = config.density;
-        
-        if (indices != NULL && value.dataType != Res_value::TYPE_NULL) {
-            indicesIdx++;
-            indices[indicesIdx] = ii;
-        }
-        
-        dest += STYLE_NUM_ENTRIES;
-    }
-    
-    res.unlock();
-    
-    if (indices != NULL) {
-        indices[0] = indicesIdx;
-        env->ReleasePrimitiveArrayCritical(outIndices, indices, 0);
-    }
-    
-    env->ReleasePrimitiveArrayCritical(outValues, baseDest, 0);
-    env->ReleasePrimitiveArrayCritical(attrs, src, 0);
-    
-    return JNI_TRUE;
-}
-    
-    AssetManager* am = assetManagerForJavaObject(env, clazz);
-    if (am == NULL) {
-        return JNI_FALSE;
-    }
-    const ResTable& res(am->getResources());
-    ResTable_config config;
-    Res_value value;
-    ssize_t block;
-    
-    const jsize NV = env->GetArrayLength(outValues);
-    
-    jint* baseDest = (jint*)env->GetPrimitiveArrayCritical(outValues, 0);
-    jint* dest = baseDest;
-    if (dest == NULL) {
-        jniThrowException(env, "java/lang/OutOfMemoryError", "");
-        return JNI_FALSE;
-    }
-    
-    // Now lock down the resource object and start pulling stuff from it.
-    res.lock();
-    
-    const ResTable::bag_entry* arrayEnt = NULL;
-    uint32_t arrayTypeSetFlags = 0;
-    ssize_t bagOff = res.getBagLocked(id, &arrayEnt, &arrayTypeSetFlags);
-    const ResTable::bag_entry* endArrayEnt = arrayEnt +
-        (bagOff >= 0 ? bagOff : 0);
-    
-    int i = 0;
-    uint32_t typeSetFlags;
-    while (i < NV && arrayEnt < endArrayEnt) {
-        block = arrayEnt->stringBlock;
-        typeSetFlags = arrayTypeSetFlags;
-        config.density = 0;
-        value = arrayEnt->map.value;
-                
-        uint32_t resid = 0;
-        if (value.dataType != Res_value::TYPE_NULL) {
-            // Take care of resolving the found resource to its final value.
-            //printf("Resolving attribute reference\n");
-            ssize_t newBlock = res.resolveReference(&value, block, &resid,
-                    &typeSetFlags, &config);
-#if THROW_ON_BAD_ID
-            if (newBlock == BAD_INDEX) {
-                jniThrowException(env, "java/lang/IllegalStateException", "Bad resource!");
-                return JNI_FALSE;
-            }
-#endif
-            if (newBlock >= 0) block = newBlock;
-        }
-
-        // Deal with the special @null value -- it turns back to TYPE_NULL.
-        if (value.dataType == Res_value::TYPE_REFERENCE && value.data == 0) {
-            value.dataType = Res_value::TYPE_NULL;
         }
 
         //printf("Attribute 0x%08x: final type=0x%x, data=0x%08x\n", curIdent, value.dataType, value.data);
