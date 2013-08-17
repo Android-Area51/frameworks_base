@@ -16,6 +16,7 @@
 
 package android.app;
 
+import com.android.internal.app.IAssetRedirectionManager;
 import android.app.backup.BackupAgent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks;
@@ -56,6 +57,7 @@ import android.os.RemoteException;
 import android.os.ServiceManager;
 import android.os.StrictMode;
 import android.os.SystemClock;
+import android.text.TextUtils;
 import android.util.AndroidRuntimeException;
 import android.util.Config;
 import android.util.DisplayMetrics;
@@ -134,6 +136,7 @@ public final class ActivityThread {
     static ContextImpl mSystemContext = null;
 
     static IPackageManager sPackageManager;
+    static IAssetRedirectionManager sAssetRedirectionManager;
 
     final ApplicationThread mAppThread = new ApplicationThread();
     final Looper mLooper = Looper.myLooper();
@@ -1147,6 +1150,18 @@ public final class ActivityThread {
         return sPackageManager;
     }
 
+    // NOTE: this method can return null if the SystemServer is still
+    // initializing (for example, of another SystemServer component is accessing
+    // a resources object)
+    public static IAssetRedirectionManager getAssetRedirectionManager() {
+        if (sAssetRedirectionManager != null) {
+            return sAssetRedirectionManager;
+        }
+        IBinder b = ServiceManager.getService("assetredirection");
+        sAssetRedirectionManager = IAssetRedirectionManager.Stub.asInterface(b);
+        return sAssetRedirectionManager;
+    }
+
     DisplayMetrics getDisplayMetricsLocked(boolean forceUpdate) {
         if (mDisplayMetrics != null && !forceUpdate) {
             return mDisplayMetrics;
@@ -1736,6 +1751,16 @@ public final class ActivityThread {
 
         } catch (Exception e) {
             if (!mInstrumentation.onException(activity, e)) {
+                if (e instanceof InflateException) {
+                    Log.e(TAG, "Failed to inflate", e);
+                    String pkg = null;
+                    if (r.packageInfo != null && !TextUtils.isEmpty(r.packageInfo.getPackageName())) {
+                        pkg = r.packageInfo.getPackageName();
+                    }
+                    Intent intent = new Intent(Intent.ACTION_APP_LAUNCH_FAILURE,
+                            (pkg != null)? Uri.fromParts("package", pkg, null) : null);
+                    getSystemContext().sendBroadcast(intent);
+                }
                 throw new RuntimeException(
                     "Unable to start activity " + component
                     + ": " + e.toString(), e);
@@ -3087,6 +3112,9 @@ public final class ActivityThread {
                     }
                 }
                 r.updateConfiguration(config, dm);
+                if (themeChanged) {
+                    r.updateStringCache();
+                }
                 //Slog.i(TAG, "Updated app resources " + v.getKey()
                 //        + " " + r + ": " + r.getConfiguration());
             } else {
