@@ -7,6 +7,7 @@
 #include "ResourceTable.h"
 
 #include "XMLNode.h"
+#include "ResourceIdCache.h"
 
 #include <utils/ByteOrder.h>
 #include <utils/ResourceTypes.h>
