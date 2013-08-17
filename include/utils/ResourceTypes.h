@@ -2029,6 +2029,11 @@ private:
     // Mapping from resource package IDs to indices into the internal
     // package array.
     uint8_t                     mPackageMap[256];
+
+    // Resource redirection mapping provided by the applied theme (if there is
+    // one).  Resources requested which are found in this map will be
+    // automatically redirected to the appropriate themed value.
+    Vector<PackageRedirectionMap*> mRedirectionMap;
 };
 
 }   // namespace android
