@@ -23,6 +23,7 @@
 #include <utils/Asset.h>
 #include <utils/ByteOrder.h>
 #include <utils/Errors.h>
+#include <utils/PackageRedirectionMap.h>
 #include <utils/String16.h>
 #include <utils/Vector.h>
 
@@ -1739,6 +1740,9 @@ public:
     status_t add(Asset* asset, void* cookie,
                  bool copyData=false);
     status_t add(ResTable* src);
+
+    void addRedirections(PackageRedirectionMap* resMap);
+    void clearRedirections();
 
     status_t getError() const;
 

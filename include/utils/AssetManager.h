@@ -23,6 +23,7 @@
 #include <utils/Asset.h>
 #include <utils/AssetDir.h>
 #include <utils/KeyedVector.h>
+#include <utils/PackageRedirectionMap.h>
 #include <utils/String8.h>
 #include <utils/Vector.h>
 #include <utils/String16.h>
@@ -216,6 +217,18 @@ public:
      * Get the known locales for this asset manager object.
      */
     void getLocales(Vector<String8>* locales) const;
+
+    /*
+     * Remove existing source for assets.
+     *
+     * Also updates the ResTable object to reflect the change.
+     *
+     * Returns "true" on success, "false" on failure.
+     */
+    bool detachThemePath(const String8& packageName, void *cookie);
+    bool attachThemePath(const String8& path, void** cookie);
+    void addRedirections(PackageRedirectionMap* resMap);
+    void clearRedirections();
 
 private:
     struct asset_path

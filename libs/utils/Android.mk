@@ -28,6 +28,7 @@ commonSources:= \
 	Flattenable.cpp \
 	ObbFile.cpp \
 	Pool.cpp \
+    PackageRedirectionMap.cpp \
 	RefBase.cpp \
 	ResourceTypes.cpp \
 	SharedBuffer.cpp \
