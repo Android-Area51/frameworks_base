@@ -92,7 +92,7 @@ public:
      * then on success, *cookie is set to the value corresponding to the
      * newly-added asset source.
      */
-    bool addAssetPath(const String8& path, void** cookie);
+    bool addAssetPath(const String8& path, void** cookie, bool asSkin=false);
 
     /*                                                                       
      * Convenience for adding the standard system assets.  Uses the
