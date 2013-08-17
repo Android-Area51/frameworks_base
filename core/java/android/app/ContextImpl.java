@@ -56,6 +56,7 @@ import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.content.pm.PackageParser.Package;
 import android.content.res.AssetManager;
+import android.content.res.Configuration;
 import android.content.res.CustomTheme;
 import android.content.res.Resources;
 import android.content.res.XmlResourceParser;
@@ -244,6 +245,20 @@ class ContextImpl extends Context {
     @Override
     public Resources getResources() {
         return mResources;
+    }
+
+    /**
+     * Refresh resources object which may have been changed by a theme
+     * configuration change.
+     */
+    /* package */ void refreshResourcesIfNecessary() {
+        if (mResources == Resources.getSystem()) {
+            return;
+        }
+
+        if (mPackageInfo.mCompatibilityInfo.isThemeable) {
+            mTheme = null;
+        }
     }
 
     @Override
