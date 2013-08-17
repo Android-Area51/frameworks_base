@@ -1789,6 +1789,8 @@ public:
                              uint32_t* inoutTypeSpecFlags = NULL,
                              ResTable_config* outConfig = NULL) const;
 
+    uint32_t lookupRedirectionMap(uint32_t resID) const;
+
     enum {
         TMP_BUFFER_SIZE = 16
     };
