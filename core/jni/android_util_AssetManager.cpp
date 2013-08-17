@@ -757,6 +757,9 @@ static jint android_content_AssetManager_loadResourceBagValue(JNIEnv* env, jobje
     // Now lock down the resource object and start pulling stuff from it.
     res.lock();
 
+    ssize_t block = -1;
+    Res_value value;
+
     const ResTable::bag_entry* entry = NULL;
     uint32_t typeSpecFlags;
     ssize_t entryCount = res.getBagLocked(ident, &entry, &typeSpecFlags);
@@ -1676,6 +1679,84 @@ static jintArray android_content_AssetManager_getArrayIntResource(JNIEnv* env, j
     }
     res.unlockBag(startOfBag);
     return array;
+}
+
+static jint android_content_AssetManager_splitThemePackage(JNIEnv* env, jobject clazz,
+		jstring srcFileName, jstring dstFileName, jobjectArray drmProtectedAssetNames)
+{
+    AssetManager* am = assetManagerForJavaObject(env, clazz);
+    if (am == NULL) {
+        return -1;
+    }
+
+    LOGV("splitThemePackage in %p (Java object %p)\n", am, clazz);
+
+    if (srcFileName == NULL || dstFileName == NULL) {
+        jniThrowException(env, "java/lang/NullPointerException", srcFileName == NULL ? "srcFileName" : "dstFileName");
+        return -2;
+    }
+
+    jsize size = env->GetArrayLength(drmProtectedAssetNames);
+    if (size == 0) {
+        jniThrowException(env, "java/lang/IllegalArgumentException", "drmProtectedAssetNames");
+        return -3;
+    }
+
+    const char* srcFileName8 = env->GetStringUTFChars(srcFileName, NULL);
+    ZipFile* srcZip = new ZipFile;
+    status_t err = srcZip->open(srcFileName8, ZipFile::kOpenReadWrite);
+    if (err != NO_ERROR) {
+        LOGV("error opening zip file %s\n", srcFileName8);
+        delete srcZip;
+        env->ReleaseStringUTFChars(srcFileName, srcFileName8);
+        return -4;
+    }
+
+    const char* dstFileName8 = env->GetStringUTFChars(dstFileName, NULL);
+    ZipFile* dstZip = new ZipFile;
+    err = dstZip->open(dstFileName8, ZipFile::kOpenReadWrite | ZipFile::kOpenTruncate | ZipFile::kOpenCreate);
+
+    if (err != NO_ERROR) {
+        LOGV("error opening zip file %s\n", dstFileName8);
+        delete srcZip;
+        delete dstZip;
+        env->ReleaseStringUTFChars(srcFileName, srcFileName8);
+        env->ReleaseStringUTFChars(dstFileName, dstFileName8);
+        return -5;
+    }
+
+    int result = 0;
+    for (int i = 0; i < size; i++) {
+        jstring javaString = (jstring)env->GetObjectArrayElement(drmProtectedAssetNames, i);
+        const char* drmProtectedAssetFileName8 = env->GetStringUTFChars(javaString, NULL);
+        ZipEntry *assetEntry = srcZip->getEntryByName(drmProtectedAssetFileName8);
+        if (assetEntry == NULL) {
+            result = 1;
+            LOGV("Invalid asset entry %s\n", drmProtectedAssetFileName8);
+        } else {
+            status_t loc_result = dstZip->add(srcZip, assetEntry, 0, NULL);
+            if (loc_result != NO_ERROR) {
+                LOGV("error copying zip entry %s\n", drmProtectedAssetFileName8);
+                result = result | 2;
+            } else {
+                loc_result = srcZip->remove(assetEntry);
+                if (loc_result != NO_ERROR) {
+                    LOGV("error removing zip entry %s\n", drmProtectedAssetFileName8);
+                    result = result | 4;
+                }
+            }
+        }
+        env->ReleaseStringUTFChars(javaString, drmProtectedAssetFileName8);
+    }
+    srcZip->flush();
+    dstZip->flush();
+
+    delete srcZip;
+    delete dstZip;
+    env->ReleaseStringUTFChars(srcFileName, srcFileName8);
+    env->ReleaseStringUTFChars(dstFileName, dstFileName8);
+
+    return (jint)result;
 }
 
 static void android_content_AssetManager_init(JNIEnv* env, jobject clazz)
