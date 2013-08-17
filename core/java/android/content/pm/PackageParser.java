@@ -209,6 +209,7 @@ public class PackageParser {
                     pi.setLockedZipFilePath(PackageParser.getLockedZipFilePath(p.mPath));
                 }
             }
+        }
         pi.applicationInfo = generateApplicationInfo(p, flags);
         pi.installLocation = p.installLocation;
         pi.firstInstallTime = firstInstallTime;
