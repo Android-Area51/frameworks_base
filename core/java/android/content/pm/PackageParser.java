@@ -1465,6 +1465,7 @@ public class PackageParser {
         owner.instrumentation.add(a);
 
         return a;
+    }
 
     private void parseApplicationThemeAttributes(XmlPullParser parser, AttributeSet attrs,
             ApplicationInfo appInfo) {
