@@ -3073,14 +3073,14 @@ public final class ActivityThread {
         }
     }
 
-    final boolean applyConfigurationToResourcesLocked(Configuration config) {
+    final int applyConfigurationToResourcesLocked(Configuration config) {
         if (mResConfiguration == null) {
             mResConfiguration = new Configuration();
         }
         if (!mResConfiguration.isOtherSeqNewer(config)) {
             if (DEBUG_CONFIGURATION) Slog.v(TAG, "Skipping new config: curSeq="
                     + mResConfiguration.seq + ", newSeq=" + config.seq);
-            return false;
+            return 0;
         }
         int changes = mResConfiguration.updateFrom(config);
         DisplayMetrics dm = getDisplayMetricsLocked(true);
