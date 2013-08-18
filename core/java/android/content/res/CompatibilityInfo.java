@@ -193,7 +193,8 @@ public class CompatibilityInfo {
                 EXPANDABLE | CONFIGURED_EXPANDABLE,
                 DisplayMetrics.DENSITY_DEVICE,
                 1.0f,
-                1.0f);
+                1.0f,
+                true);
     }
 
     /**
