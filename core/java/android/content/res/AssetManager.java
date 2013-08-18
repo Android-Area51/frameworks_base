@@ -266,6 +266,12 @@ public final class AssetManager {
         }
     }
 
+    /*package*/ final void recreateStringBlocks() {
+        synchronized (this) {
+            makeStringBlocks(true);
+        }
+    }
+
     private final void makeStringBlocks(boolean copyFromSystem) {
         final int sysNum = copyFromSystem ? sSystem.mStringBlocks.length : 0;
         final int num = getStringBlockCount();
