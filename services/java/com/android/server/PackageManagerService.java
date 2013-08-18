@@ -603,7 +603,7 @@ class PackageManagerService extends IPackageManager.Stub {
                         PackageInstalledInfo res = data.res;
 
                         if (res.returnCode == PackageManager.INSTALL_SUCCEEDED) {
-                            res.removedInfo.sendBroadcast(false, true);
+                            res.removedInfo.sendBroadcast(false, true, false);
                             Bundle extras = new Bundle(1);
                             extras.putInt(Intent.EXTRA_UID, res.uid);
                             final boolean update = res.removedInfo.removedPackage != null;
@@ -616,10 +616,11 @@ class PackageManagerService extends IPackageManager.Stub {
                             }
                             sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED,
                                     res.pkg.applicationInfo.packageName,
+                                    category,
                                     extras, null);
                             if (update) {
                                 sendPackageBroadcast(Intent.ACTION_PACKAGE_REPLACED,
-                                        res.pkg.applicationInfo.packageName,
+                                        res.pkg.applicationInfo.packageName, category,
                                         extras, null);
                             }
                             if (res.removedInfo.args != null) {
@@ -4608,7 +4609,7 @@ class PackageManagerService extends IPackageManager.Stub {
                             }
                             addedPackage = p.applicationInfo.packageName;
                             addedUid = p.applicationInfo.uid;
-                       }
+                        }
                     }
                     if (p != null && p.mIsThemeApk) {
                         category = Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE;
@@ -4624,13 +4625,13 @@ class PackageManagerService extends IPackageManager.Stub {
                 Bundle extras = new Bundle(1);
                 extras.putInt(Intent.EXTRA_UID, removedUid);
                 extras.putBoolean(Intent.EXTRA_DATA_REMOVED, false);
-                sendPackageBroadcast(Intent.ACTION_PACKAGE_REMOVED, removedPackage,
+                sendPackageBroadcast(Intent.ACTION_PACKAGE_REMOVED, removedPackage, category,
                         extras, null);
             }
             if (addedPackage != null) {
                 Bundle extras = new Bundle(1);
                 extras.putInt(Intent.EXTRA_UID, addedUid);
-                sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED, addedPackage,
+                sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED, addedPackage, category,
                         extras, null);
             }
         }
@@ -6302,9 +6303,8 @@ class PackageManagerService extends IPackageManager.Stub {
                 if (info.isThemeApk) {
                     category = Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE;
                 }
-
-                sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED, packageName, extras, null);
-                sendPackageBroadcast(Intent.ACTION_PACKAGE_REPLACED, packageName, extras, null);
+                sendPackageBroadcast(Intent.ACTION_PACKAGE_ADDED, packageName, category, extras, null);
+                sendPackageBroadcast(Intent.ACTION_PACKAGE_REPLACED, packageName, category, extras, null);
             }
         }
         // Force a gc here.
@@ -6341,10 +6341,10 @@ class PackageManagerService extends IPackageManager.Stub {
                 if (isThemeApk) {
                     category = Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE;
                 }
-                sendPackageBroadcast(Intent.ACTION_PACKAGE_REMOVED, removedPackage, extras, null);
+                sendPackageBroadcast(Intent.ACTION_PACKAGE_REMOVED, removedPackage, category, extras, null);
             }
             if (removedUid >= 0) {
-                sendPackageBroadcast(Intent.ACTION_UID_REMOVED, null, extras, null);
+                sendPackageBroadcast(Intent.ACTION_UID_REMOVED, null, null, extras, null);
             }
         }
     }
