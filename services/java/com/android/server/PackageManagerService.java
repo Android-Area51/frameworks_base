@@ -6316,7 +6316,7 @@ class PackageManagerService extends IPackageManager.Stub {
         InstallArgs args = null;
         boolean isThemeApk = false;
 
-        void sendBroadcast(boolean fullRemove, boolean replacing) {
+        void sendBroadcast(boolean fullRemove, boolean replacing,
                 boolean deleteLockedZipFileIfExists) {
             Bundle extras = new Bundle(1);
             extras.putInt(Intent.EXTRA_UID, removedUid >= 0 ? removedUid : uid);
