@@ -180,6 +180,17 @@ public class PackageParser {
         return name.endsWith(".apk");
     }
 
+    public static String getLockedZipFilePath(String path) {
+        if (path == null) {
+            return null;
+        }
+        if (isPackageFilename(path)) {
+            return path.substring(0, path.length() - 4) + ".locked.zip";
+        } else {
+            return path + ".locked.zip";
+        }
+    }
+
     /**
      * Generate and return the {@link PackageInfo} for a parsed package.
      *
