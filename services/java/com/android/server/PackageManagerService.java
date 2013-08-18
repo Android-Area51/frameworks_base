@@ -16,7 +16,6 @@
 
 package com.android.server;
 
-import com.android.internal.app.IAssetRedirectionManager;
 import com.android.internal.app.IMediaContainerService;
 import com.android.internal.app.ResolverActivity;
 import com.android.internal.content.NativeLibraryHelper;
@@ -68,7 +67,6 @@ import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.content.pm.ServiceInfo;
 import android.content.pm.Signature;
-import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.Build;
@@ -5960,19 +5958,7 @@ class PackageManagerService extends IPackageManager.Stub {
             Log.e(TAG, "Failure to generate new zip files for theme");
         }
     }
-        synchronized (mPackages) {
-            updatePermissionsLP(newPackage.packageName, newPackage,
-                    newPackage.permissions.size() > 0, true, false);
-            res.name = pkgName;
-            res.uid = newPackage.applicationInfo.uid;
-            res.pkg = newPackage;
-            mSettings.setInstallStatus(pkgName, PKG_INSTALL_COMPLETE);
-            mSettings.setInstallerPackageName(pkgName, installerPackageName);
-            res.returnCode = PackageManager.INSTALL_SUCCEEDED;
-            //to update install status
-            mSettings.writeLP();
-        }
-    }
+
 
     private void installPackageLI(InstallArgs args,
             boolean newInstall, PackageInstalledInfo res) {
