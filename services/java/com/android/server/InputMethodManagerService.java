@@ -16,6 +16,7 @@
 
 package com.android.server;
 
+import com.android.internal.app.ThemeUtils;
 import com.android.internal.content.PackageMonitor;
 import com.android.internal.os.HandlerCaller;
 import com.android.internal.view.IInputContext;
@@ -110,6 +111,7 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
     static final long TIME_TO_RECONNECT = 10*1000;
 
     final Context mContext;
+    private Context mUiContext;
     final Handler mHandler;
     final SettingsObserver mSettingsObserver;
     final StatusBarManagerService mStatusBar;
@@ -465,6 +467,13 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
         screenOnOffFilt.addAction(Intent.ACTION_SCREEN_OFF);
         screenOnOffFilt.addAction(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
         mContext.registerReceiver(new ScreenOnOffReceiver(), screenOnOffFilt);
+
+        ThemeUtils.registerThemeChangeReceiver(mContext, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mUiContext = null;
+            }
+        });
 
         mStatusBar = statusBar;
         statusBar.setIconVisibility("ime", false);
@@ -1704,6 +1713,13 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
 
         // Previous state was disabled.
         return false;
+    }
+
+    private Context getUiContext() {
+        if (mUiContext == null) {
+            mUiContext = ThemeUtils.createUiContext(mContext);
+        }
+        return mUiContext != null ? mUiContext : mContext;
     }
 
     // ----------------------------------------------------------------------
