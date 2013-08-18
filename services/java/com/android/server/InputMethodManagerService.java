@@ -34,6 +34,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
