@@ -4485,7 +4485,7 @@ class PackageManagerService extends IPackageManager.Stub {
         }
     };
 
-    private static final void sendPackageBroadcast(String action, String pkg,
+    private static final void sendPackageBroadcast(String action, String pkg, String intentCategory,
             Bundle extras, IIntentReceiver finishedReceiver) {
         IActivityManager am = ActivityManagerNative.getDefault();
         if (am != null) {
@@ -4496,6 +4496,9 @@ class PackageManagerService extends IPackageManager.Stub {
                     intent.putExtras(extras);
                 }
                 intent.addFlags(Intent.FLAG_RECEIVER_REGISTERED_ONLY_BEFORE_BOOT);
+                if (intentCategory != null) {
+                    intent.addCategory(intentCategory);
+                }
                 am.broadcastIntent(null, intent, null, finishedReceiver,
                         0, null, null, null, finishedReceiver != null, false);
             } catch (RemoteException ex) {
@@ -7038,8 +7041,8 @@ class PackageManagerService extends IPackageManager.Stub {
         extras.putStringArray(Intent.EXTRA_CHANGED_COMPONENT_NAME_LIST, nameList);
         extras.putBoolean(Intent.EXTRA_DONT_KILL_APP, killFlag);
         extras.putInt(Intent.EXTRA_UID, packageUid);
-        sendPackageBroadcast(Intent.ACTION_PACKAGE_CHANGED,  packageName, extras, null);
-    }
+        sendPackageBroadcast(Intent.ACTION_PACKAGE_CHANGED,  packageName, null, extras, null);
+    } 
 
     public String getInstallerPackageName(String packageName) {
         synchronized (mPackages) {
@@ -10064,7 +10067,7 @@ class PackageManagerService extends IPackageManager.Stub {
            }
            String action = mediaStatus ? Intent.ACTION_EXTERNAL_APPLICATIONS_AVAILABLE
                    : Intent.ACTION_EXTERNAL_APPLICATIONS_UNAVAILABLE;
-           sendPackageBroadcast(action, null, extras, finishedReceiver);
+           sendPackageBroadcast(action, null, null, extras, finishedReceiver);
        }
    }
 
