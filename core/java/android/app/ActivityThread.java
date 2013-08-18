@@ -3134,6 +3134,8 @@ public final class ActivityThread {
 
         ArrayList<ComponentCallbacks> callbacks = null;
 
+        int diff = 0;
+
         synchronized (mPackages) {
             if (mPendingConfiguration != null) {
                 if (!mPendingConfiguration.isOtherSeqNewer(config)) {
@@ -3149,11 +3151,8 @@ public final class ActivityThread {
             if (DEBUG_CONFIGURATION) Slog.v(TAG, "Handle configuration changed: "
                     + config);
         
-            applyConfigurationToResourcesLocked(config);
-            
-            if (mConfiguration == null) {
-                mConfiguration = new Configuration();
-            }
+            diff = applyConfigurationToResourcesLocked(config);
+
             if (!mConfiguration.isOtherSeqNewer(config)) {
                 return;
             }
@@ -3165,7 +3164,20 @@ public final class ActivityThread {
         if (callbacks != null) {
             final int N = callbacks.size();
             for (int i=0; i<N; i++) {
-                performConfigurationChanged(callbacks.get(i), config);
+                ComponentCallbacks cb = callbacks.get(i);
+
+                // We removed the old resources object from the mActiveResources
+                // cache, now we need to trigger an update for each application.
+                if ((diff & ActivityInfo.CONFIG_THEME_RESOURCE) != 0) {
+                    if (cb instanceof ContextWrapper) {
+                        Context context = ((ContextWrapper)cb).getBaseContext();
+                        if (context instanceof ContextImpl) {
+                            ((ContextImpl)context).refreshResourcesIfNecessary();
+                        }
+                    }
+                }
+
+                performConfigurationChanged(cb, config);
             }
         }
     }
@@ -3761,7 +3773,7 @@ public final class ActivityThread {
                     // We need to apply this change to the resources
                     // immediately, because upon returning the view
                     // hierarchy will be informed about it.
-                    if (applyConfigurationToResourcesLocked(newConfig)) {
+                    if (applyConfigurationToResourcesLocked(newConfig) != 0) {
                         // This actually changed the resources!  Tell
                         // everyone about it.
                         if (mPendingConfiguration == null ||
