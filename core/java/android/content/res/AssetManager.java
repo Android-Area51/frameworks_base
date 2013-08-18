@@ -19,6 +19,7 @@ package android.content.res;
 import android.os.ParcelFileDescriptor;
 import android.util.Config;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 
 import java.io.FileNotFoundException;
@@ -84,6 +85,13 @@ public final class AssetManager {
     private boolean mThemeSupport;
     private String mThemePackageName;
     private int mThemeCookie;
+
+    /**
+     * Organize all added redirection maps using Java strong references to keep
+     * the native layer cleanup simple (that is, finalize() in Java will be
+     * responsible for delete in C++).
+     */
+    private SparseArray<PackageRedirectionMap> mRedirections;
  
     /**
      * Create a new AssetManager containing only the basic system assets.
