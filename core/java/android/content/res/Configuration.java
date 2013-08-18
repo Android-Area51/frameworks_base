@@ -176,6 +176,21 @@ public final class Configuration implements Parcelable, Comparable<Configuration
     public static final int ORIENTATION_PORTRAIT = 1;
     public static final int ORIENTATION_LANDSCAPE = 2;
     public static final int ORIENTATION_SQUARE = 3;
+
+    /**
+     * @hide
+     */
+    public static final int THEME_UNDEFINED = 0;
+
+    /**
+     * @hide
+     */
+    public static final String THEME_ID_PERSISTENCE_PROPERTY = "persist.sys.themeId";
+
+    /**
+     * @hide
+     */
+    public static final String THEME_PACKAGE_NAME_PERSISTENCE_PROPERTY = "persist.sys.themePackageName";
     
     /**
      * Overall orientation of the screen.  May be one of
