@@ -32,6 +32,7 @@ import android.content.ContentResolver;
 import android.content.ContentService;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.IPackageManager;
 import android.database.ContentObserver;
 import android.database.Cursor;
