@@ -38,12 +38,14 @@ import android.content.res.AssetManager;
 import android.content.res.CompatibilityInfo;
 import android.content.res.Configuration;
 import android.content.res.CustomTheme;
+import android.content.res.PackageRedirectionMap;
 import android.content.res.Resources;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDebug;
 import android.database.sqlite.SQLiteDebug.DbStats;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
@@ -67,6 +69,7 @@ import android.util.Log;
 import android.util.LogPrinter;
 import android.util.Slog;
 import android.view.Display;
+import android.view.InflateException;
 import android.view.View;
 import android.view.ViewDebug;
 import android.view.ViewManager;
@@ -3124,7 +3127,7 @@ public final class ActivityThread {
             }
         }
         
-        return changes != 0;
+        return changes;
     }
     
     final void handleConfigurationChanged(Configuration config) {
