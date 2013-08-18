@@ -17,6 +17,7 @@
 package com.android.server.am;
 
 import com.android.internal.R;
+import com.android.internal.app.ThemeUtils;
 import com.android.internal.os.BatteryStatsImpl;
 import com.android.server.AttributeCache;
 import com.android.server.IntentResolver;
@@ -1589,6 +1590,15 @@ public final class ActivityManagerService extends ActivityManagerNative
             synchronized(mPidsSelfLocked) {
                 mOnBattery = DEBUG_POWER ? true : onBattery;
             }
+        }
+    }
+
+    private Context getUiContext() {
+        synchronized (this) {
+            if (mUiContext == null && mBooted) {
+                mUiContext = ThemeUtils.createUiContext(mContext);
+            }
+            return mUiContext != null ? mUiContext : mContext;
         }
     }
 
@@ -3687,7 +3697,12 @@ public final class ActivityManagerService extends ActivityManagerNative
                 }
             }
         }, pkgFilter);
-        
+        ThemeUtils.registerThemeChangeReceiver(mContext, new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                mUiContext = null;
+            }
+        });
         synchronized (this) {
             // Ensure that any processes we had put on hold are now started
             // up.
@@ -11472,6 +11487,7 @@ public final class ActivityManagerService extends ActivityManagerNative
             SystemProperties.set("persist.sys.country", l.getCountry());
             SystemProperties.set("persist.sys.localevar", l.getVariant());
         }
+    }
 
     private void saveThemeResourceLocked(CustomTheme t, boolean isDiff){
         if(isDiff){
