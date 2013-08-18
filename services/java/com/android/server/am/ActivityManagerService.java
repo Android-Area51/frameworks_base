@@ -1592,7 +1592,6 @@ public final class ActivityManagerService extends ActivityManagerNative
         }
     }
 
-
     private Context getUiContext() {
         synchronized (this) {
             if (mUiContext == null && mBooted) {
