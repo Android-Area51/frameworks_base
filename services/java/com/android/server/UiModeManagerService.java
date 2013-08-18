@@ -77,6 +77,7 @@ class UiModeManagerService extends IUiModeManager.Stub {
     private static final String ACTION_UPDATE_NIGHT_MODE = "com.android.server.action.UPDATE_NIGHT_MODE";
 
     private final Context mContext;
+    private Context mUiContext;
 
     final Object mLock = new Object();
 
@@ -230,6 +231,13 @@ class UiModeManagerService extends IUiModeManager.Stub {
                 // Time zone has changed!
                 mHandler.sendEmptyMessage(MSG_GET_NEW_LOCATION_UPDATE);
             }
+        }
+    };
+
+    private final BroadcastReceiver mThemeChangeReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            mUiContext = null;
         }
     };
 
@@ -786,6 +794,13 @@ class UiModeManagerService extends IUiModeManager.Stub {
         mAlarmManager.set(AlarmManager.RTC_WAKEUP, nextUpdate, pendingIntent);
 
         mComputedNightMode = nightMode;
+    }
+
+    private Context getUiContext() {
+        if (mUiContext == null) {
+            mUiContext = ThemeUtils.createUiContext(mContext);
+        }
+        return mUiContext != null ? mUiContext : mContext;
     }
 
     @Override
