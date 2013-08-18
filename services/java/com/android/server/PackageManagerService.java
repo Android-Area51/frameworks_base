@@ -350,6 +350,8 @@ class PackageManagerService extends IPackageManager.Stub {
     ComponentName mResolveComponentName;
     PackageParser.Package mPlatformPackage;
 
+    IAssetRedirectionManager mAssetRedirectionManager;
+
     // Set of pending broadcasts for aggregating enable/disable of components.
     final HashMap<String, ArrayList<String>> mPendingBroadcasts
             = new HashMap<String, ArrayList<String>>();
@@ -6282,7 +6284,7 @@ class PackageManagerService extends IPackageManager.Stub {
 
         if(res && sendBroadCast) {
             boolean systemUpdate = info.isRemovedPackageSystemUpdate;
-            info.sendBroadcast(deleteCodeAndResources, systemUpdate);
+            info.sendBroadcast(deleteCodeAndResources, systemUpdate, true);
 
             // If the removed package was a system update, the old system packaged
             // was re-enabled; we need to broadcast this information
