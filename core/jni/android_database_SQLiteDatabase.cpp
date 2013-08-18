@@ -172,20 +172,6 @@ static void dbopen(JNIEnv* env, jobject object, jstring pathString, jint flags)
                goto done;
            }
         }
-        else {
-            // Set autocheckpoint = 100 pages
-            err = sqlite3_wal_autocheckpoint(handle,
-                                             100);
-            if (SQLITE_OK != err) {
-               LOGE("sqlite3_exec to set WAL autocheckpoint failed\n");
-               throw_sqlite3_exception(env, handle);
-               goto done;
-            } else if (use_wal_mode(path8) == 2) {
-                /* Try to disable fsyncs. We don't care if it fails */
-                sqlite3_exec(handle,"PRAGMA synchronous = OFF;",
-                           NULL, NULL,&zErrMsg);
-            }
-        }
     }
 
     // The soft heap limit prevents the page cache allocations from growing
