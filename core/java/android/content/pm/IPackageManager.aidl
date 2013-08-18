@@ -1,6 +1,7 @@
 /*
 **
 ** Copyright 2007, The Android Open Source Project
+** This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License");
 ** you may not use this file except in compliance with the License.
@@ -337,4 +338,9 @@ interface IPackageManager {
 
     boolean setInstallLocation(int loc);
     int getInstallLocation();
+
+    String[] getRevokedPermissions(String packageName);
+
+    void setRevokedPermissions(String packageName, in String[] perms);
+
 }

@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2008 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,6 +20,8 @@ package android.content.res;
 import android.content.pm.ActivityInfo;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.os.SystemProperties;
+import android.text.TextUtils;
 
 import java.util.Locale;
 
@@ -50,7 +53,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      */
     public Locale locale;
 
-     /**
+    /**
      * @hide
      */
     public CustomTheme customTheme;
@@ -191,7 +194,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      * @hide
      */
     public static final String THEME_PACKAGE_NAME_PERSISTENCE_PROPERTY = "persist.sys.themePackageName";
-    
+
     /**
      * Overall orientation of the screen.  May be one of
      * {@link #ORIENTATION_LANDSCAPE}, {@link #ORIENTATION_PORTRAIT},
@@ -265,7 +268,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             customTheme = (CustomTheme) o.customTheme.clone();
         }
     }
-   
+    
     public String toString() {
         StringBuilder sb = new StringBuilder(128);
         sb.append("{ scale=");
@@ -308,7 +311,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      * Set this object to the system defaults.
      */
     public void setToDefaults() {
-        fontScale = 1;
+        fontScale = 0;
         mcc = mnc = 0;
         locale = null;
         userSetLocale = false;
@@ -419,13 +422,13 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         if (delta.seq != 0) {
             seq = delta.seq;
         }
-
+        
         if (delta.customTheme != null
                 && (customTheme == null || !customTheme.equals(delta.customTheme))) {
             changed |= ActivityInfo.CONFIG_THEME_RESOURCE;
             customTheme = (CustomTheme)delta.customTheme.clone();
         }
-        
+
         return changed;
     }
 
@@ -505,7 +508,6 @@ public final class Configuration implements Parcelable, Comparable<Configuration
                 && uiMode != delta.uiMode) {
             changed |= ActivityInfo.CONFIG_UI_MODE;
         }
-
         if (delta.customTheme != null &&
                 (customTheme == null || !customTheme.equals(delta.customTheme))) {
             changed |= ActivityInfo.CONFIG_THEME_RESOURCE;
@@ -526,7 +528,9 @@ public final class Configuration implements Parcelable, Comparable<Configuration
      * @return Return true if the resource needs to be loaded, else false.
      */
     public static boolean needNewResources(int configChanges, int interestingChanges) {
-        return (configChanges & (interestingChanges|ActivityInfo.CONFIG_FONT_SCALE)) != 0;
+        return (configChanges & (interestingChanges |
+                ActivityInfo.CONFIG_FONT_SCALE |
+                ActivityInfo.CONFIG_THEME_RESOURCE)) != 0;
     }
     
     /**
@@ -592,6 +596,7 @@ public final class Configuration implements Parcelable, Comparable<Configuration
         dest.writeInt(screenLayout);
         dest.writeInt(uiMode);
         dest.writeInt(seq);
+
         if (customTheme == null) {
             dest.writeInt(0);
         } else {

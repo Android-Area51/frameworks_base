@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,6 +18,12 @@
 package android.app;
 
 import com.android.internal.app.IAssetRedirectionManager;
+import com.android.internal.os.BinderInternal;
+import com.android.internal.os.RuntimeInit;
+import com.android.internal.os.SamplingProfilerIntegration;
+
+import org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl;
+
 import android.app.backup.BackupAgent;
 import android.content.BroadcastReceiver;
 import android.content.ComponentCallbacks;
@@ -27,7 +34,6 @@ import android.content.ContextWrapper;
 import android.content.IContentProvider;
 import android.content.IIntentReceiver;
 import android.content.Intent;
-import android.content.IIntentReceiver;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.IPackageManager;
@@ -48,7 +54,6 @@ import android.database.sqlite.SQLiteDebug.DbStats;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
@@ -80,12 +85,6 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.WindowManagerImpl;
 
-import com.android.internal.os.BinderInternal;
-import com.android.internal.os.RuntimeInit;
-import com.android.internal.os.SamplingProfilerIntegration;
-
-import org.apache.harmony.xnet.provider.jsse.OpenSSLSocketImpl;
-
 import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
@@ -100,8 +99,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
-
-import dalvik.system.SamplingProfiler;
 
 final class SuperNotCalledException extends AndroidRuntimeException {
     public SuperNotCalledException(String msg) {
@@ -157,7 +154,8 @@ public final class ActivityThread {
     final HashMap<IBinder, Service> mServices
             = new HashMap<IBinder, Service>();
     AppBindData mBoundApplication;
-    Configuration mConfiguration;
+    Configuration mConfiguration = new Configuration();
+
     Configuration mResConfiguration;
     Application mInitialApplication;
     final ArrayList<Application> mAllApplications
@@ -3075,6 +3073,12 @@ public final class ActivityThread {
         }
     }
 
+    /*
+     * Original code returned a boolean here to denote whether changes were
+     * detected.  But T-Mobile must know what specifically has changed to check
+     * later if the theme had changed, so we return the changes bitmap instead.
+     * Caller beware.
+     */
     final int applyConfigurationToResourcesLocked(Configuration config) {
         if (mResConfiguration == null) {
             mResConfiguration = new Configuration();
@@ -3154,7 +3158,7 @@ public final class ActivityThread {
                     + config);
         
             diff = applyConfigurationToResourcesLocked(config);
-
+            
             if (!mConfiguration.isOtherSeqNewer(config)) {
                 return;
             }

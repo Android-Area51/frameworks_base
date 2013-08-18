@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +23,17 @@ import com.google.android.collect.Maps;
 
 import org.xmlpull.v1.XmlPullParserException;
 
+import android.accounts.AccountManager;
+import android.accounts.IAccountManager;
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.IContentProvider;
+import android.content.IIntentReceiver;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.IIntentReceiver;
 import android.content.IntentSender;
 import android.content.ReceiverCallNotAllowedException;
 import android.content.ServiceConnection;
@@ -77,6 +80,8 @@ import android.net.IThrottleManager;
 import android.net.Uri;
 import android.net.wifi.IWifiManager;
 import android.net.wifi.WifiManager;
+import android.net.wimax.WimaxHelper;
+import android.net.wimax.WimaxManagerConstants;
 import android.nfc.NfcManager;
 import android.os.Binder;
 import android.os.Bundle;
@@ -177,6 +182,7 @@ class ContextImpl extends Context {
     private static ThrottleManager sThrottleManager;
     private static WifiManager sWifiManager;
     private static LocationManager sLocationManager;
+    private static Object sWimaxManager;
     private static final HashMap<String, SharedPreferencesImpl> sSharedPrefs =
             new HashMap<String, SharedPreferencesImpl>();
 
@@ -191,6 +197,7 @@ class ContextImpl extends Context {
     private Resources.Theme mTheme = null;
     private PackageManager mPackageManager;
     private NotificationManager mNotificationManager = null;
+    private ProfileManager mProfileManager = null;
     private ActivityManager mActivityManager = null;
     private WallpaperManager mWallpaperManager = null;
     private Context mReceiverRestrictedContext = null;
@@ -963,6 +970,8 @@ class ContextImpl extends Context {
             return getWifiManager();
         } else if (NOTIFICATION_SERVICE.equals(name)) {
             return getNotificationManager();
+        } else if (PROFILE_SERVICE.equals(name)) {
+            return getProfileManager();
         } else if (KEYGUARD_SERVICE.equals(name)) {
             return new KeyguardManager();
         } else if (ACCESSIBILITY_SERVICE.equals(name)) {
@@ -1004,6 +1013,8 @@ class ContextImpl extends Context {
             return getDownloadManager();
         } else if (NFC_SERVICE.equals(name)) {
             return getNfcManager();
+        } else if (WimaxManagerConstants.WIMAX_SERVICE.equals(name)) {
+            return getWimaxManager();
         }
 
         return null;
@@ -1097,6 +1108,16 @@ class ContextImpl extends Context {
             }
         }
         return mNotificationManager;
+    }
+
+    private ProfileManager getProfileManager() {
+        synchronized (mSync) {
+            if (mProfileManager == null) {
+                mProfileManager = new ProfileManager(getOuterContext(),
+                        mMainThread.getHandler());
+            }
+        }
+        return mProfileManager;
     }
 
     private WallpaperManager getWallpaperManager() {
@@ -1249,6 +1270,15 @@ class ContextImpl extends Context {
             }
         }
         return mNfcManager;
+    }
+
+    private Object getWimaxManager() {
+        synchronized (sSync) {
+            if (sWimaxManager == null) {
+                sWimaxManager = WimaxHelper.createWimaxService(this, mMainThread.getHandler());
+            }
+        }
+        return sWimaxManager;
     }
 
     @Override
@@ -2764,6 +2794,25 @@ class ContextImpl extends Context {
                 // Should never happen!
             }
             return PackageManager.COMPONENT_ENABLED_STATE_DEFAULT;
+        }
+
+        @Override
+        public String[] getRevokedPermissions(String packageName) {
+            try {
+                return mPM.getRevokedPermissions(packageName);
+            } catch (RemoteException e) {
+                // Should never happen!
+            }
+            return new String[0];
+        }
+
+        @Override
+        public void setRevokedPermissions(String packageName, String[] perms) {
+            try {
+                mPM.setRevokedPermissions(packageName, perms);
+            } catch (RemoteException e) {
+                // Should never happen!
+            }
         }
 
         private final ContextImpl mContext;

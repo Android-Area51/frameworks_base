@@ -34,6 +34,7 @@ import org.xmlpull.v1.XmlPullParserException;
 import android.app.ActivityManagerNative;
 import android.app.AlertDialog;
 import android.app.PendingIntent;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -1510,7 +1511,7 @@ public class InputMethodManagerService extends IInputMethodManager.Stub
     void showInputMethodMenu() {
         if (DEBUG) Slog.v(TAG, "Show switching menu");
 
-        final Context context = mContext;
+        final Context context = getUiContext();
 
         final PackageManager pm = context.getPackageManager();
 

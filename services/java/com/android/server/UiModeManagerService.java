@@ -56,6 +56,7 @@ import java.util.Iterator;
 
 import com.android.internal.R;
 import com.android.internal.app.DisableCarModeActivity;
+import com.android.internal.app.ThemeUtils;
 
 class UiModeManagerService extends IUiModeManager.Stub {
     private static final String TAG = UiModeManager.class.getSimpleName();
@@ -334,6 +335,8 @@ class UiModeManagerService extends IUiModeManager.Stub {
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         mContext.registerReceiver(mUpdateLocationReceiver, filter);
 
+        ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
+
         PowerManager powerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, TAG);
 
@@ -554,9 +557,10 @@ class UiModeManagerService extends IUiModeManager.Stub {
             updateConfigurationLocked(true);
 
             // keep screen on when charging and in car mode
+            // or when on a desk dock
             boolean keepScreenOn = mCharging &&
                     ((mCarModeEnabled && mCarModeKeepsScreenOn) ||
-                     (mCurUiMode == Configuration.UI_MODE_TYPE_DESK && mDeskModeKeepsScreenOn));
+                    ((mCurUiMode&Configuration.UI_MODE_TYPE_DESK)!=0 && mDeskModeKeepsScreenOn));
             if (keepScreenOn != mWakeLock.isHeld()) {
                 if (keepScreenOn) {
                     mWakeLock.acquire();
@@ -600,7 +604,7 @@ class UiModeManagerService extends IUiModeManager.Stub {
                 n.flags = Notification.FLAG_ONGOING_EVENT;
                 n.when = 0;
                 n.setLatestEventInfo(
-                        mContext,
+                        getUiContext(),
                         mContext.getString(R.string.car_mode_disable_notification_title),
                         mContext.getString(R.string.car_mode_disable_notification_message),
                         PendingIntent.getActivity(mContext, 0, carModeOffIntent, 0));

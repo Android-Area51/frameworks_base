@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2005 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1991,6 +1992,7 @@ public:
 
 #ifndef HAVE_ANDROID_OS
     void print(bool inclValues) const;
+    static String8 normalizeForOutput(const char* input);
 #endif
 
 private:

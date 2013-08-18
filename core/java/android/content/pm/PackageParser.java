@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2007 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -1985,6 +1986,8 @@ public class PackageParser {
             return null;
         }
 
+        parseActivityThemeAttributes(parser, attrs, a.info);
+
         int outerDepth = parser.getDepth();
         int type;
         while ((type=parser.next()) != XmlPullParser.END_DOCUMENT
@@ -2839,10 +2842,10 @@ public class PackageParser {
         
         // For use by package manager to keep track of where it has done dexopt.
         public boolean mDidDexOpt;
-
+        
         // Is Theme Apk
         public boolean mIsThemeApk = false;
-        
+
         // Theme info
         public final ArrayList<ThemeInfo> mThemeInfos = new ArrayList<ThemeInfo>(0);
 

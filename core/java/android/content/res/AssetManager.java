@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +79,7 @@ public final class AssetManager {
     private int mNumRefs = 1;
     private boolean mOpen = true;
     private HashMap<Integer, RuntimeException> mRefStacks; 
-
+ 
     private String mAssetDir;
     private String mAppName;
 
@@ -92,7 +93,7 @@ public final class AssetManager {
      * responsible for delete in C++).
      */
     private SparseArray<PackageRedirectionMap> mRedirections;
- 
+
     /**
      * Create a new AssetManager containing only the basic system assets.
      * Applications will not generally use this method, instead retrieving the
@@ -249,6 +250,7 @@ public final class AssetManager {
             StringBlock[] blocks = mStringBlocks;
             if (blocks == null) {
                 ensureStringBlocks();
+                blocks = mStringBlocks;
             }
             outValue.string = blocks[block].get(outValue.data);
             return true;
@@ -760,7 +762,7 @@ public final class AssetManager {
         clearRedirectionsNative();
     }
 
-     /**
+    /**
      * Determine whether the state in this asset manager is up-to-date with
      * the files on the filesystem.  If false is returned, you need to
      * instantiate a new AssetManager class to see the new data.

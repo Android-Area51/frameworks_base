@@ -1,6 +1,7 @@
 /* //device/libs/android_runtime/android_util_AssetManager.cpp
 **
 ** Copyright 2006, The Android Open Source Project
+** This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
 **
 ** Licensed under the Apache License, Version 2.0 (the "License"); 
 ** you may not use this file except in compliance with the License. 
@@ -724,7 +725,7 @@ static jint android_content_AssetManager_loadResourceValue(JNIEnv* env, jobject 
     Res_value value;
     ResTable_config config;
     uint32_t typeSpecFlags;
-    ssize_t block = res.getResource(ident, &value, false, &typeSpecFlags, &config);
+    ssize_t block = res.getResource(ref, &value, false, &typeSpecFlags, &config);
 #if THROW_ON_BAD_ID
     if (block == BAD_INDEX) {
         jniThrowException(env, "java/lang/IllegalStateException", "Bad resource!");
@@ -755,7 +756,7 @@ static jint android_content_AssetManager_loadResourceBagValue(JNIEnv* env, jobje
     
     // Now lock down the resource object and start pulling stuff from it.
     res.lock();
-
+    
     ssize_t block = -1;
     Res_value value;
 
@@ -999,7 +1000,6 @@ static jboolean android_content_AssetManager_applyStyle(JNIEnv* env, jobject cla
     // Now lock down the resource object and start pulling stuff from it.
     res.lock();
 
-    
     // Apply theme redirections to the referenced styles.
     if (defStyleRes != 0) {
         uint32_t ref = res.lookupRedirectionMap(defStyleRes);
