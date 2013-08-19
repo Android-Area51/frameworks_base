@@ -1472,12 +1472,13 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             mCmBatteryMiniIcon.updateMatrix();
             recreateStatusBar();
         } else {
-        mClearButton.setText(getText(R.string.status_bar_clear_all_button));
-        mOngoingTitle.setText(getText(R.string.status_bar_ongoing_events_title));
-        mLatestTitle.setText(getText(R.string.status_bar_latest_events_title));
-        mNoNotificationsTitle.setText(getText(R.string.status_bar_no_notifications_title));
+            mClearButton.setText(getText(R.string.status_bar_clear_all_button));
+            mOngoingTitle.setText(getText(R.string.status_bar_ongoing_events_title));
+            mLatestTitle.setText(getText(R.string.status_bar_latest_events_title));
+            mNoNotificationsTitle.setText(getText(R.string.status_bar_no_notifications_title));
 
-        mEdgeBorder = res.getDimensionPixelSize(R.dimen.status_bar_edge_ignore);
+            mEdgeBorder = res.getDimensionPixelSize(R.dimen.status_bar_edge_ignore);
+        }
 
         if (false) Slog.v(TAG, "updateResources");
     }
