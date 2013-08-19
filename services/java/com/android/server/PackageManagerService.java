@@ -4560,6 +4560,7 @@ class PackageManagerService extends IPackageManager.Stub {
             int removedUid = -1;
             String addedPackage = null;
             int addedUid = -1;
+            String category = null;
 
             synchronized (mInstallLock) {
                 String fullPathStr = null;
