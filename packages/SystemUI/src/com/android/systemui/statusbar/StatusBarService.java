@@ -1468,8 +1468,8 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         if (newTheme != null &&
                 (mCurrentTheme == null || !mCurrentTheme.equals(newTheme))) {
             mCurrentTheme = (CustomTheme)newTheme.clone();
-            mCmBatteryMiniIcon.updateIconCache();
-            mCmBatteryMiniIcon.updateMatrix();
+           // mCmBatteryMiniIcon.updateIconCache();
+           // mCmBatteryMiniIcon.updateMatrix();
             recreateStatusBar();
         } else {
             mClearButton.setText(getText(R.string.status_bar_clear_all_button));
