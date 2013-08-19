@@ -107,6 +107,10 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     H mHandler = new H();
     Object mQueueLock = new Object();
 
+    // last theme that was applied in order to detect theme change (as opposed
+    // to some other configuration change).
+    CustomTheme mCurrentTheme;
+
     // icons
     LinearLayout mIcons;
     IconMerger mNotificationIcons;
