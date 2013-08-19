@@ -56,6 +56,7 @@ import java.util.Iterator;
 
 import com.android.internal.R;
 import com.android.internal.app.DisableCarModeActivity;
+import com.android.internal.app.ThemeUtils;
 
 class UiModeManagerService extends IUiModeManager.Stub {
     private static final String TAG = UiModeManager.class.getSimpleName();
@@ -333,6 +334,8 @@ class UiModeManagerService extends IUiModeManager.Stub {
         IntentFilter filter = new IntentFilter(Intent.ACTION_AIRPLANE_MODE_CHANGED);
         filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         mContext.registerReceiver(mUpdateLocationReceiver, filter);
+
+        ThemeUtils.registerThemeChangeReceiver(mContext, mThemeChangeReceiver);
 
         PowerManager powerManager = (PowerManager)context.getSystemService(Context.POWER_SERVICE);
         mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, TAG);
