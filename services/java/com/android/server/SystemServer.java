@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,6 +23,7 @@ import com.android.internal.app.ShutdownThread;
 import com.android.internal.os.BinderInternal;
 import com.android.internal.os.SamplingProfilerIntegration;
 
+import dalvik.system.DexClassLoader;
 import dalvik.system.VMRuntime;
 import dalvik.system.Zygote;
 
@@ -490,6 +492,15 @@ class ServerThread extends Thread {
             pm.systemReady();
         } catch (RemoteException e) {
         }
+
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE);
+        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE_RESET);
+        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
+        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
+        filter.addCategory(Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE);
+        filter.addDataScheme("package");
+        context.registerReceiver(new AppsLaunchFailureReceiver(), filter);
 
         IntentFilter filter = new IntentFilter();
         filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE);
