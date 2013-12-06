@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2006 The Android Open Source Project
+ * This code has been modified.  Portions copyright (C) 2010, T-Mobile USA, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -101,8 +102,6 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-import dalvik.system.SamplingProfiler;
-
 final class SuperNotCalledException extends AndroidRuntimeException {
     public SuperNotCalledException(String msg) {
         super(msg);
@@ -157,7 +156,8 @@ public final class ActivityThread {
     final HashMap<IBinder, Service> mServices
             = new HashMap<IBinder, Service>();
     AppBindData mBoundApplication;
-    Configuration mConfiguration;
+    Configuration mConfiguration = new Configuration();
+
     Configuration mResConfiguration;
     Application mInitialApplication;
     final ArrayList<Application> mAllApplications
