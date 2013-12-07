@@ -502,15 +502,6 @@ class ServerThread extends Thread {
         filter.addDataScheme("package");
         context.registerReceiver(new AppsLaunchFailureReceiver(), filter);
 
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE);
-        filter.addAction(Intent.ACTION_APP_LAUNCH_FAILURE_RESET);
-        filter.addAction(Intent.ACTION_PACKAGE_ADDED);
-        filter.addAction(Intent.ACTION_PACKAGE_REMOVED);
-        filter.addCategory(Intent.CATEGORY_THEME_PACKAGE_INSTALLED_STATE_CHANGE);
-        filter.addDataScheme("package");
-        context.registerReceiver(new AppsLaunchFailureReceiver(), filter);
-
         // These are needed to propagate to the runnable below.
         final StatusBarManagerService statusBarF = statusBar;
         final BatteryService batteryF = battery;
