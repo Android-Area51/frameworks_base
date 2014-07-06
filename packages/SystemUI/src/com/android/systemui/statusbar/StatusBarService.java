@@ -48,6 +48,7 @@ import android.os.Message;
 import android.os.ServiceManager;
 import android.os.SystemClock;
 import android.text.TextUtils;
+import android.util.Pair;
 import android.util.Slog;
 import android.util.Log;
 import android.view.Display;
@@ -408,7 +409,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         
         // Recalculate the position of the sliding windows and the titles.
         setAreThereNotifications();
-        mStatusBarContainer.addView(mStatusBarView);
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
     }
 
@@ -1469,6 +1469,15 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         }
     };
 
+    private static void copyNotifications(ArrayList<Pair<IBinder, StatusBarNotification>> dest,
+            NotificationData source) {
+        int N = source.size();
+        for (int i = 0; i < N; i++) {
+            NotificationData.Entry entry = source.getEntryAt(i);
+            dest.add(Pair.create(entry.key, entry.notification));
+        }
+    }
+
     private void recreateStatusBar() {
         mStatusBarContainer.removeAllViews();
 
@@ -1481,7 +1490,35 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             icons.add(iconView.getStatusBarIcon());
             iconSlots.add(iconView.getStatusBarSlot());
         }
-    };
+
+        // extract notifications.
+        int nNotifs = mOngoing.size() + mLatest.size();
+        ArrayList<Pair<IBinder, StatusBarNotification>> notifications =
+                new ArrayList<Pair<IBinder, StatusBarNotification>>(nNotifs);
+        copyNotifications(notifications, mOngoing);
+        copyNotifications(notifications, mLatest);
+        //mOngoing.clear();
+        //mLatest.clear();
+
+        makeStatusBarView(this);
+
+        // recreate StatusBarIconViews.
+        for (int i = 0; i < nIcons; i++) {
+            StatusBarIcon icon = icons.get(i);
+            String slot = iconSlots.get(i);
+            addIcon(slot, i, i, icon);
+        }
+
+        // recreate notifications.
+        for (int i = 0; i < nNotifs; i++) {
+            Pair<IBinder, StatusBarNotification> notifData = notifications.get(i);
+            addNotificationViews(notifData.first, notifData.second);
+        }
+
+        setAreThereNotifications();
+        mStatusBarContainer.addView(mStatusBarView);
+        updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
+    }
 
     /**
      * Reload some of our resources when the configuration changes.
