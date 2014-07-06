@@ -100,6 +100,14 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     CommandQueue mCommandQueue;
     IStatusBarService mBarService;
 
+    /**
+     * Shallow container for {@link #mStatusBarView} which is added to the
+     * window manager impl as the actual status bar root view. This is done so
+     * that the original status_bar layout can be reinflated into this container
+     * on skin change.
+     */
+    FrameLayout mStatusBarContainer;
+
     int mIconSize;
     Display mDisplay;
     StatusBarView mStatusBarView;
@@ -242,6 +250,9 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         }
 
         // Put up the view
+        FrameLayout container = new FrameLayout(this);
+        container.addView(mStatusBarView);
+        mStatusBarContainer = container;
         addStatusBarView();
 
         // Lastly, call to the icon policy to install/update all the icons.
@@ -335,7 +346,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         Resources res = getResources();
         final int height= res.getDimensionPixelSize(com.android.internal.R.dimen.status_bar_height);
 
-        final StatusBarView view = mStatusBarView;
+        final View view = mStatusBarContainer;
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
                 height,
@@ -397,6 +408,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         
         // Recalculate the position of the sliding windows and the titles.
         setAreThereNotifications();
+        mStatusBarContainer.addView(mStatusBarView);
         updateExpandedViewPos(EXPANDED_LEAVE_ALONE);
     }
 
@@ -1454,6 +1466,20 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
             else if (Intent.ACTION_CONFIGURATION_CHANGED.equals(action)) {
                 updateResources();
             }
+        }
+    };
+
+    private void recreateStatusBar() {
+        mStatusBarContainer.removeAllViews();
+
+        // extract icons from the soon-to-be recreated viewgroup.
+        int nIcons = mStatusIcons.getChildCount();
+        ArrayList<StatusBarIcon> icons = new ArrayList<StatusBarIcon>(nIcons);
+        ArrayList<String> iconSlots = new ArrayList<String>(nIcons);
+        for (int i = 0; i < nIcons; i++) {
+            StatusBarIconView iconView = (StatusBarIconView)mStatusIcons.getChildAt(i);
+            icons.add(iconView.getStatusBarIcon());
+            iconSlots.add(iconView.getStatusBarSlot());
         }
     };
 
