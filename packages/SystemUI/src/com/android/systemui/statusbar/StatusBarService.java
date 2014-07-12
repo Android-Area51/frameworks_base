@@ -1497,8 +1497,8 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
                 new ArrayList<Pair<IBinder, StatusBarNotification>>(nNotifs);
         copyNotifications(notifications, mOngoing);
         copyNotifications(notifications, mLatest);
-        //mOngoing.clear();
-        //mLatest.clear();
+        mOngoing.clear();
+        mLatest.clear();
 
         makeStatusBarView(this);
 
@@ -1535,8 +1535,6 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         if (newTheme != null &&
                 (mCurrentTheme == null || !mCurrentTheme.equals(newTheme))) {
             mCurrentTheme = (CustomTheme)newTheme.clone();
-           // mCmBatteryMiniIcon.updateIconCache();
-           // mCmBatteryMiniIcon.updateMatrix();
             recreateStatusBar();
         } else {
             mClearButton.setText(getText(R.string.status_bar_clear_all_button));
