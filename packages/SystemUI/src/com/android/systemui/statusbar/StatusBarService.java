@@ -79,7 +79,7 @@ import java.util.Set;
 
 import com.android.systemui.R;
 import com.android.systemui.statusbar.policy.StatusBarPolicy;
-
+import com.android.systemui.statusbar.BatteryMiniIcon.SettingsObserver;
 
 
 public class StatusBarService extends Service implements CommandQueue.Callbacks {
@@ -135,6 +135,8 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
     // top bar
     TextView mNoNotificationsTitle;
     TextView mClearButton;
+    ViewGroup mClearButtonParent;
+    BatteryMiniIcon mBatteryMiniIcon;
     // drag bar
     CloseDragHandle mCloseView;
     // ongoing
@@ -305,6 +307,7 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         mIcons = (LinearLayout)sb.findViewById(R.id.icons);
         mTickerView = sb.findViewById(R.id.ticker);
         mDateView = (DateView)sb.findViewById(R.id.date);
+        mBatteryMiniIcon = (BatteryMiniIcon)sb.findViewById(R.id.BatteryMiniIcon);
 
         mExpandedDialog = new ExpandedDialog(context);
         mExpandedView = expanded;
@@ -1550,6 +1553,8 @@ public class StatusBarService extends Service implements CommandQueue.Callbacks 
         if (newTheme != null &&
                 (mCurrentTheme == null || !mCurrentTheme.equals(newTheme))) {
             mCurrentTheme = (CustomTheme)newTheme.clone();
+            mBatteryMiniIcon.updateIconCache();
+            mBatteryMiniIcon.updateMatrix();
             recreateStatusBar();
         } else {
             mClearButton.setText(getText(R.string.status_bar_clear_all_button));

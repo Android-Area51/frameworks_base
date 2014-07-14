@@ -47,7 +47,15 @@
             android:layout_alignParentRight="true"
             android:paddingRight="6dip"
             android:gravity="center_vertical"
-            android:orientation="horizontal"/>    
+            android:orientation="horizontal"/>
+
+        <com.android.systemui.statusbar.BatteryMiniIcon
+            android:id="@+id/BatteryMiniIcon"
+            android:textAppearance="@*android:style/TextAppearance.StatusBar.Icon"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"/>   
 
         <com.android.systemui.statusbar.Clock
             android:textAppearance="@*android:style/TextAppearance.StatusBar.Icon"
