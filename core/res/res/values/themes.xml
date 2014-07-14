@@ -26,7 +26,7 @@
          of it a dark color.
     -->
     <style name="Theme">
-    
+
         <item name="colorForeground">@android:color/bright_foreground_dark</item>
         <item name="colorForegroundInverse">@android:color/bright_foreground_dark_inverse</item>
         <item name="colorBackground">@android:color/background_dark</item>
@@ -141,6 +141,10 @@
         <item name="textSelectHandleRight">@android:drawable/text_select_handle_right</item>
         <item name="textSelectHandle">@android:drawable/text_select_handle_middle</item>
         <item name="textSelectHandleWindowStyle">@android:style/Widget.TextSelectHandle</item>
+
+        <!-- status bar related attributes -->
+        <item name="statusBarExpandedBackgroundColor">@android:color/black</item>
+        <item name="statusBarLatestItemBackground">@android:drawable/list_selector_background</item>
 
         <!-- Widget styles -->
         <item name="absListViewStyle">@android:style/Widget.AbsListView</item>
@@ -261,6 +265,9 @@
 		<item name="progressBarStyleInverse">@android:style/Widget.ProgressBar</item>
 		<item name="progressBarStyleSmallInverse">@android:style/Widget.ProgressBar.Small</item>
 		<item name="progressBarStyleLargeInverse">@android:style/Widget.ProgressBar.Large</item> 
+
+        <!-- status bar related attributes -->
+        <item name="statusBarExpandedBackgroundColor">@android:color/white</item>
     </style>
     
     <!-- Variant of the light theme with no title bar -->

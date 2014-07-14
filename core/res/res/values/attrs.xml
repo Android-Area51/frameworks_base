@@ -469,6 +469,12 @@
              anchor for positioning the cursor within text. -->
         <attr name="textSelectHandle" format="reference" />
 
+        <!-- =================== -->
+        <!-- status bar related attributes -->
+        <!-- =================== -->
+        <attr name="statusBarExpandedBackgroundColor" format="reference" />
+        <attr name="statusBarLatestItemBackground" format="reference" />
+
     </declare-styleable>
 
     <!-- **************************************************************** -->
