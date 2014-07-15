@@ -27,9 +27,7 @@
             android:ellipsize="marquee"
             android:fadingEdge="horizontal"
             android:paddingLeft="4dp"
-            android:textStyle="bold"
-            android:paddingLeft="4dp"
-            android:textAppearance="@style/TextAppearance.Medium" />
+            />
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -44,7 +42,6 @@
             android:singleLine="true"
             android:ellipsize="marquee"
             android:fadingEdge="horizontal"
-            android:textAppearance="@style/TextAppearance.Small"
             android:paddingLeft="4dp"
             />
         <android.widget.DateTimeView android:id="@+id/time"
@@ -54,6 +51,6 @@
             android:layout_height="wrap_content"
             android:singleLine="true"
             android:paddingRight="5dp"
-            android:textAppearance="@style/TextAppearance.Small" />
+            />
     </LinearLayout>
 </LinearLayout>
