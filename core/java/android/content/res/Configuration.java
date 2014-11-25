@@ -425,7 +425,6 @@ public final class Configuration implements Parcelable, Comparable<Configuration
             changed |= ActivityInfo.CONFIG_THEME_RESOURCE;
             customTheme = (CustomTheme)delta.customTheme.clone();
         }
-        
         return changed;
     }
 
@@ -505,7 +504,6 @@ public final class Configuration implements Parcelable, Comparable<Configuration
                 && uiMode != delta.uiMode) {
             changed |= ActivityInfo.CONFIG_UI_MODE;
         }
-
         if (delta.customTheme != null &&
                 (customTheme == null || !customTheme.equals(delta.customTheme))) {
             changed |= ActivityInfo.CONFIG_THEME_RESOURCE;
