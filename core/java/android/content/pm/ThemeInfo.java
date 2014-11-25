@@ -39,6 +39,7 @@ import android.content.res.Resources;
  *        pluto:ringtoneFileName="media/audio/ringtone.mp3"
  *        pluto:notificationRingtoneFileName="media/audio/locked/notification.mp3"
  *        pluto:copyright="T-Mobile, 2009"
+ *        pluto:wallpaperImage="media/images/wallpaper.jpg"
  *    />
  *
  * @hide
